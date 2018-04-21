@@ -6,6 +6,7 @@
     <Authors>Brian Whims</Authors>
     <Description>This is a Redux-like library for .NET Applications.</Description>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://github.com/bcwhims/ReduxForDotNet/</PackageProjectUrl>
   </PropertyGroup>
 
 </Project>
