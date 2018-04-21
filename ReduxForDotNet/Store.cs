@@ -142,35 +142,31 @@ namespace ReduxForDotNet
                     {
                         return selector(state);
                     }
-                    catch (Exception) { }
-                    return default(TReturn);
+                    catch (Exception)
+                    {
+                        return default(TReturn);
+                    }
                 };
                 selectorReturnValues[name] = selectorDictionary[name](store.State);
 
                 void handler(object sender, StateChangeEventArgs<TState> eventArgs)
                 {
-                    try
+                    var newValue = selectorDictionary[name](eventArgs.NewState);
+                    var previousValue = selectorReturnValues[name];
+                    if (!EqualityComparer<TReturn>.Default.Equals(newValue, previousValue))
                     {
-                        var newValue = selectorDictionary[name](eventArgs.NewState);
-                        var previousValue = selectorReturnValues[name];
-                        if (valueChangedCallback != null && !EqualityComparer<TReturn>.Default.Equals(newValue, previousValue))
+                        selectorReturnValues[name] = newValue;
+                        try
                         {
-                            selectorReturnValues[name] = newValue;
-                            valueChangedCallback(previousValue, newValue);
+                            valueChangedCallback?.Invoke(previousValue, newValue);
+                        }
+                        catch (Exception)
+                        {
+                            valueChangedCallback = null;
                         }
                     }
-                    catch (Exception)
-                    {
-                        store.StateChanged -= handler;
-                    }
-
                 }
-
-                if (valueChangedCallback != null)
-                {
-                    store.StateChanged += handler;
-                }
-                
+                store.StateChanged += handler;
                 return true;
             }
         }
